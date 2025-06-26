@@ -22,15 +22,15 @@ Thread(target=run).start()
 # Telegram Bot Setup
 # -------------------------------
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
-SESSION_NAME = "smashbot"  # This will create smashbot.session file
+SESSION_NAME = "smashbot"
 
-# This is for bot usage — no need for API_ID or API_HASH
-client = TelegramClient(SESSION_NAME, api_id=0, api_hash="", bot_token=BOT_TOKEN)
+# Create TelegramClient without api_id/api_hash (not used with bot token)
+client = TelegramClient(SESSION_NAME, api_id=12345, api_hash='fakehash')  # dummy values for compatibility
 
 # Track links to prevent duplicate "smash"
 seen_links = set()
 
-@client.on(events.NewMessage(chats='mainet_community'))  # Replace with your actual group/channel username
+@client.on(events.NewMessage(chats='mainet_community'))  # replace with your group username
 async def handler(event):
     message = event.message
     text = message.message
@@ -58,7 +58,7 @@ async def handler(event):
     else:
         print("[i] New message received – no buttons found.")
 
-# Start the bot
-client.start()
+# Start the client with bot token
+client.start(bot_token=BOT_TOKEN)
 print("✅ SmashBot is running. Waiting for raids in mainet_community...")
 client.run_until_disconnected()
