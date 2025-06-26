@@ -3,6 +3,8 @@ from threading import Thread
 from telethon.sync import TelegramClient, events
 import os
 import asyncio
+print("[DEBUG] Current dir:", os.listdir('.'))
+
 
 app = Flask(__name__)
 
