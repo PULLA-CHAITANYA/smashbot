@@ -1,38 +1,45 @@
 from flask import Flask
 from telethon import TelegramClient, events
 
-# Your Telegram credentials
 API_ID = 25749247
 API_HASH = '5c8f9cdbed12339f4d1d9414a0151bc7'
 BOT_TOKEN = '8176490384:AAHviqKbsu0Xx-HKUOL5_qts1gnCzfl8dvQ'
+SESSION_NAME = 'bot.session'
 
-SESSION_NAME = 'bot_session'
-
-# Initialize Flask app
 app = Flask(__name__)
 
-# Initialize Telegram client with bot token
-client = TelegramClient(SESSION_NAME, API_ID, API_HASH).start(bot_token=BOT_TOKEN)
+# Reuse session to prevent repeated logins
+client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
 
-# Telegram message handler
+async def start_bot():
+    if not await client.is_user_authorized():
+        await client.start(bot_token=BOT_TOKEN)
+
+# Event: /start
 @client.on(events.NewMessage(pattern='/start'))
 async def start_handler(event):
-    await event.respond("👋 Hello! Bot received your /start command.")
-    print(f"[LOG] Replied to /start from @{event.sender.username}")
+    await event.respond("👋 Hello! Bot is alive.")
+    print(f"Started with @{event.sender.username}")
 
+# Event: All other messages
 @client.on(events.NewMessage)
-async def echo_handler(event):
+async def reply_handler(event):
     if event.text != "/start":
-        await event.respond("🤖 Bot received your message!")
-        print(f"[LOG] Echoed to @{event.sender.username}: {event.text}")
+        await event.respond("🤖 Bot received your message.")
+        print(f"Echoed: {event.text}")
 
-# Flask root route
 @app.route('/')
 def index():
     return "✅ Bot is running!"
 
-# Run both Flask and Telegram bot
+# Launch everything
 if __name__ == '__main__':
+    import asyncio
     import threading
-    threading.Thread(target=client.run_until_disconnected).start()
+
+    def run_telegram():
+        asyncio.run(start_bot())
+        client.run_until_disconnected()
+
+    threading.Thread(target=run_telegram).start()
     app.run(host='0.0.0.0', port=8080)
