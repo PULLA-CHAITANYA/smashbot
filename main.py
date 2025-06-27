@@ -4,9 +4,10 @@ import asyncio
 import os
 
 # === Set your real credentials here ===
-API_ID = 12345678  # Replace with your actual API ID
-API_HASH = "your_api_hash"  # Replace with your actual API hash
-BOT_TOKEN = "your_bot_token"  # Replace with your bot token
+API_ID = 25749247
+  # Replace with your actual API ID
+API_HASH = "5c8f9cdbed12339f4d1d9414a0151bc7"  # Replace with your actual API hash
+BOT_TOKEN = "8176490384:AAHviqKbsu0Xx-HKUOL5_qts1gnCzfl8dvQ"  # Replace with your bot token
 
 SESSION_NAME = "bot"  # Just a dummy name; won't store .session
 
