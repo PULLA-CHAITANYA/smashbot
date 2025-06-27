@@ -1,21 +1,20 @@
-from telethon.sync import TelegramClient
 from flask import Flask
-
-API_ID = 1234567  # your correct int
-API_HASH = 'your_api_hash_here'  # your correct string
-BOT_TOKEN = '8176490384:AAHviqKbsu0Xx-HKUOL5_qts1gnCzfl8dvQ'
-
-SESSION_NAME = 'bot'  # or anything, no need to upload .session file
-
-client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
+from telethon.sync import TelegramClient
+import os
 
 app = Flask(__name__)
 
-@app.route("/")
+API_ID = int(os.environ.get('API_ID'))  # Set this in Railway variables
+API_HASH = os.environ.get('API_HASH')
+BOT_TOKEN = os.environ.get('BOT_TOKEN')
+
+SESSION_NAME = 'bot'  # Just a name, no session file required
+
+client = TelegramClient(SESSION_NAME, API_ID, API_HASH).start(bot_token=BOT_TOKEN)
+
+@app.route('/')
 def home():
-    return "SmashBot is running!"
+    return "Bot is alive!", 200
 
 if __name__ == "__main__":
-    with client:
-        client.start(bot_token=BOT_TOKEN)
-        app.run(host="0.0.0.0", port=8080)
+    app.run(host="0.0.0.0", port=8080)
