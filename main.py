@@ -1,38 +1,38 @@
-from telethon import TelegramClient, events
 from flask import Flask
-import asyncio
-import os
+from telethon import TelegramClient, events
 
-# === Set your real credentials here ===
+# Your Telegram credentials
 API_ID = 25749247
-  # Replace with your actual API ID
-API_HASH = "5c8f9cdbed12339f4d1d9414a0151bc7"  # Replace with your actual API hash
-BOT_TOKEN = "8176490384:AAHviqKbsu0Xx-HKUOL5_qts1gnCzfl8dvQ"  # Replace with your bot token
+API_HASH = '5c8f9cdbed12339f4d1d9414a0151bc7'
+BOT_TOKEN = '8176490384:AAHviqKbsu0Xx-HKUOL5_qts1gnCzfl8dvQ'
 
-SESSION_NAME = "bot"  # Just a dummy name; won't store .session
+SESSION_NAME = 'bot_session'
 
-# === Create client ===
-client = TelegramClient(SESSION_NAME, API_ID, API_HASH)
-
-# === Flask app ===
+# Initialize Flask app
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return "🤖 Bot is running!"
+# Initialize Telegram client with bot token
+client = TelegramClient(SESSION_NAME, API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
-# === Register events only once ===
+# Telegram message handler
+@client.on(events.NewMessage(pattern='/start'))
+async def start_handler(event):
+    await event.respond("👋 Hello! Bot received your /start command.")
+    print(f"[LOG] Replied to /start from @{event.sender.username}")
+
 @client.on(events.NewMessage)
-async def handler(event):
-    if event.out or event.is_private is False:
-        return  # Ignore bot's own messages and group messages
-    await event.reply("✅ Bot received your message!")
+async def echo_handler(event):
+    if event.text != "/start":
+        await event.respond("🤖 Bot received your message!")
+        print(f"[LOG] Echoed to @{event.sender.username}: {event.text}")
 
-async def start_bot():
-    await client.start(bot_token=BOT_TOKEN)
-    print("🤖 Bot is running...")
+# Flask root route
+@app.route('/')
+def index():
+    return "✅ Bot is running!"
 
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.create_task(start_bot())
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+# Run both Flask and Telegram bot
+if __name__ == '__main__':
+    import threading
+    threading.Thread(target=client.run_until_disconnected).start()
+    app.run(host='0.0.0.0', port=8080)
