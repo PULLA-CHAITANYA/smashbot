@@ -1,28 +1,28 @@
-from telethon.sync import TelegramClient, events
+from telethon import TelegramClient, events
 from flask import Flask
+import asyncio
+
+# === Replace these with your actual credentials ===
+API_ID = 25749247
+  # 🟡 Your actual API_ID (no quotes)
+API_HASH = "5c8f9cdbed12339f4d1d9414a0151bc7"  # 🟡 Your actual API_HASH (quotes okay)
+BOT_TOKEN = "8176490384:AAHviqKbsu0Xx-HKUOL5_qts1gnCzfl8dvQ"  # 🟡 Your bot token from BotFather
+
+# === Dummy session name for bot; session file will not be created ===
+client = TelegramClient("bot", API_ID, API_HASH).start(bot_token=BOT_TOKEN)
 
 app = Flask(__name__)
 
-API_ID = 123456  # Replace with your actual API_ID
-API_HASH = 'your_api_hash'  # Replace with your actual API_HASH
-BOT_TOKEN = 'your_bot_token'  # Replace with your actual bot token
-SESSION_NAME = 'bot'
-
-client = TelegramClient(SESSION_NAME, API_ID, API_HASH).start(bot_token=BOT_TOKEN)
-
 @app.route('/')
 def home():
-    return 'Bot is running!'
+    return "🤖 Bot is live!"
 
-# Listen for new messages
 @client.on(events.NewMessage)
 async def handler(event):
-    print(f"New message: {event.message.text}")
-    await event.reply("Hello from Railway! 🤖")
+    await event.reply("✅ Bot received your message!")
 
-# Start both Flask and Telegram client
-if __name__ == '__main__':
-    import asyncio
+# === Run Flask + Telethon together ===
+if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.create_task(client.run_until_disconnected())
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host="0.0.0.0", port=8080)
